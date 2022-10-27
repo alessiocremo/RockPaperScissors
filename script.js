@@ -1,121 +1,119 @@
-// const prompt = require("prompt-sync")();
+const userChoiceElement = document.getElementById('user-choice')
+const computerChoiceElement = document.getElementById('computer-choice')
+const roundWinnerElement = document.getElementById('round-winner')
+const buttonElements = document.querySelectorAll('.possible-choices')
+const buttonNumbers = buttonElements.length
+const userScoreElement=document.getElementById("user-score")
+const computerScoreElement=document.getElementById("computer-score")
+const playAgainButton = document.getElementById("play-again")
 
-function getword(){
-    const rps=["Rock","Paper","Scissors"];
-    let x = Math.floor(Math.random()*2) +1;
-    //console.log(x);
-    return rps[x];
-};
 
 
-function getComputerChoice(){
-    let cc = getword();
-    cc = cc.toString();
-    cc=cc.toLowerCase();
-    //console.log("scelta pc  " + cc);
-    return cc;
-};
+let choices=[]     //array which contains name of all possible choices
 
-function getUserChoice(){
-    let uc = prompt("Please insert your choice  ");
-    uc = uc.toString();
-    uc = uc.toLowerCase();
-    return uc;
-};
+for (let i=0; i<buttonNumbers; i++){
+    choices[i]=buttonElements[i].getAttribute('id')
+}
 
-function round(){
-    let CC;
-    let UC;
-    CC = getComputerChoice();
-    //CC=CC.toLowerCase();
-    let x=0;
-    while (x==0){
-        UC =  getUserChoice();
-        if((UC=="rock") || (UC=="paper") || (UC=="scissors"))
-            x=1
-        else 
-            console.log("input must be one between rock, paper or scissors, case doesn't matter")
+let userChoice
+let computerChoice
+let userScore = 0
+let computerScore = 0
+
+buttonElements.forEach(button => button.addEventListener('click', (e) => {
+    if (userScore <5 && computerScore <5) {
+    userChoice = e.target.id
+    userChoiceElement.innerHTML = userChoice
+    computerChoice = generateComputerChoice()
+    computerChoiceElement.innerHTML = computerChoice
+    playRound(userChoice, computerChoice)
     }
 
-    //console.log("check uc  ", UC);
-    //console.log("check cc  ", CC);
+    if (userScore == 5 || computerScore==5){
+        playAgainButton.disabled=false
+        for (let i=0; i<buttonNumbers; i++)
+            buttonElements[i].disabled=true
+        playAgainButton.addEventListener('click', playAgain)
+    }
+    
+}))
 
-    if (UC==CC) {
-        console.log(UC + " ties with " + CC +".");
-        return 0;
-    }   // 1 = tie
-        
-    else if ((CC=="scissors" && CC =="paper") || (CC=="rock" && UC=="scissors") || (CC=="paper" && UC=="rock")) {
-        console.log(CC + " beats " + UC + ".")
-        return 1;
-    } //1 = computer wins
-        
-    else {
-        console.log(UC + " beats " + CC + ".")
-        return 2;
-    }            //2 = user wins
-        
+
+
+function playRound(uc, cc){
+    let uccc = uc + cc
+    console.log(uccc)
+    let roundWinner
+
+    switch(uccc) {
+        case "rockrock":
+            roundWinner = "Tie"
+            break
+        case "paperpaper":
+            roundWinner = "Tie"
+            break
+
+        case "scissorsscissors":
+            roundWinner = "Tie"
+            break
+
+
+        case "rockpaper": 
+            computerScore++
+            roundWinner = "Computer"
+            break
+
+        case "paperscissors":
+            computerScore++
+            roundWinner = "Computer"
+            break
+
+        case "scissorsrock":
+            computerScore++
+            roundWinner = "Computer"
+            break
+
+        case "rockscissors":
+            userScore++
+            roundWinner = "User"
+            break
+
+        case "scissorspaper":
+            userScore++
+            roundWinner = "User"
+            break
+
+        case "paperrock":
+            userScore++
+            roundWinner = "User"
+            break
+
+    }
+
+    roundWinnerElement.innerHTML = roundWinner
+    userScoreElement.innerHTML = userScore
+    computerScoreElement.innerHTML = computerScore
 
 }
 
 
-function whowon(c, u){
-    if (c==u)       //0 tie
-        return 0;
-    else if (c>u)        //1 computer won
-        return 1;
-    else            //2 user won
-        return 2;
-};
 
-
-function game() {
-
-    let result;
-    let finalresult;
-    let ccounter=0;
-    let ucounter=0;
-
-    for (let i = 0; i<5; i++){
-        result=round()
-        if (result==1) {
-            ccounter++;
-            console.log ("computer wins round" + (i+1));
-        }
-            
-        else if (result==2){
-            console.log ("user wins round" + (i+1) );
-            ucounter++;
-        }
-
-        else
-            console.log("tie in round " + (i+1))
-
-        console.log("score is now " + ucounter + " points for user and " + ccounter + " points for computer. \n")
-    }
-
-
-    finalresult=whowon(ccounter, ucounter);
-    
-    
-    console.log ("Game over. Final result is " + ucounter + " points for user and " + ccounter + " pointes for computer\n")
-
-
-    if (finalresult==0){
-        console.log("game ended with a tie " + ucounter + "-" + ccounter)
-    }
-    else if (finalresult==1){
-        console.log("Computer wins with " + ccounter + " points against " + ucounter + " user points.")
-    }
-    else {
-        console.log("User wins with" + ucounter + " points against " + ccounter + " computer points." )
-    }
+function playAgain(){
+    userChoiceElement.innerHTML=''
+    computerChoiceElement.innerHTML=''
+    roundWinnerElement.innerHTML=''
+    userScoreElement.innerHTML=''
+    computerScoreElement.innerHTML=''
+    userScore=0
+    computerScore=0
+    for (let i=0; i<buttonNumbers; i++)
+            buttonElements[i].disabled=false
+    playAgainButton.disabled=true
 
 }
 
 
-game();
-
-
-
-
+function generateComputerChoice () {
+    const randomNumber = Math.floor(Math.random() * buttonNumbers)  //generates random number between 1 and 3
+    return choices[randomNumber]
+}
